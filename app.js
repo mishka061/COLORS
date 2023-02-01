@@ -18,8 +18,13 @@ function generateRandomColor() {
 
 //создаем рандомные цвета для колонок
 //итерируем с помощью forEach стрелочной функцией
+//text- меняем цвет,который соответствует колонке
+//color- присваиваем тексту значение цвета
 function setRandomColors() {
     cols.forEach((col) => {
+        const text = col.querySelector('h2')
+        const color = chroma.random()
+        text.textContent = color
         col.style.background = generateRandomColor()
     })
 }
