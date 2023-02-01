@@ -1,6 +1,36 @@
 //метод забирает список необходимых элементов
 const cols =document.querySelectorAll('.col')
  
+
+//если нажали пробел,до должны обновиться цвета
+document.addEventListener('keydown', (event) => {
+    if (event.code.toLowerCase() === 'space') {
+  setRandomColors()
+}
+})
+
+// обращаемся к элементу по которому сделан клик
+// dataset хранит объект всех дата_атрибутов, которые есть
+// реализуем функцию закрытия замка
+// tagName свойство дает в строковом значении название тега по которому кликнули
+// если символ i,  то получаем event.target(целевой элемент, который вызывает событие) 
+// иначе,если кнопка ,то получаем первого ребенка у массива кнопок
+document.addEventListener('click', (event) => {
+  const type = event.target.dataset.type
+if (type === 'lock') {
+  const node =
+    event.target.tagName.toLowerCase() === 'i'
+    ? event.target
+    : event.target.children[0]
+
+  node.classList.toggle('fa-lock-open')
+  node.classList.toggle('fa-lock')
+}
+
+})
+
+
+
 //функция отдает код рандомно созданного цвета
 // 0123456789ABCDEF все цвета, которые генерируют цвет
 //Math.floor округляем чтобы получить целое число
@@ -21,10 +51,12 @@ function generateRandomColor() {
 function setRandomColors() {
     cols.forEach((col) => {
         const text = col.querySelector('h2')
+        const button = col.querySelector('button')
         const color = chroma.random()
         text.textContent = color
         col.style.background = generateRandomColor()
         setTextColor(text, color)
+        setTextColor(button, color)
     })
 }
 
