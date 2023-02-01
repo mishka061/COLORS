@@ -3,7 +3,9 @@ const cols =document.querySelectorAll('.col')
  
 
 //если нажали пробел,до должны обновиться цвета
+// preventDefault() -отменяем дефолтное поведение
 document.addEventListener('keydown', (event) => {
+    event.preventDefault()
     if (event.code.toLowerCase() === 'space') {
   setRandomColors()
 }
@@ -26,11 +28,7 @@ if (type === 'lock') {
   node.classList.toggle('fa-lock-open')
   node.classList.toggle('fa-lock')
 }
-
 })
-
-
-
 //функция отдает код рандомно созданного цвета
 // 0123456789ABCDEF все цвета, которые генерируют цвет
 //Math.floor округляем чтобы получить целое число
@@ -48,11 +46,17 @@ function generateRandomColor() {
 //итерируем с помощью forEach стрелочной функцией
 //text- меняем цвет,который соответствует колонке
 //color- присваиваем тексту значение цвета
+//isLoscet-определяем у колонки является ли она заблокированной,если да, то цвет не меняем
+//
 function setRandomColors() {
     cols.forEach((col) => {
+        const isLoscet = col.querySelector('i').classList.contains('fa-lock')
         const text = col.querySelector('h2')
         const button = col.querySelector('button')
         const color = chroma.random()
+        if (isLoscet) {
+            return
+        }
         text.textContent = color
         col.style.background = generateRandomColor()
         setTextColor(text, color)
