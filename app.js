@@ -9,7 +9,6 @@ document.addEventListener("keydown", (event) => {
     setRandomColors();
   }
 });
-
 // обращаемся к элементу по которому сделан клик
 // dataset хранит объект всех дата_атрибутов, которые есть
 // реализуем функцию закрытия замка
@@ -18,6 +17,7 @@ document.addEventListener("keydown", (event) => {
 // иначе,если кнопка ,то получаем первого ребенка у массива кнопок
 document.addEventListener("click", (event) => {
   const type = event.target.dataset.type;
+
   if (type === "lock") {
     const node =
       event.target.tagName.toLowerCase() === "i"
@@ -26,8 +26,11 @@ document.addEventListener("click", (event) => {
 
     node.classList.toggle("fa-lock-open");
     node.classList.toggle("fa-lock");
+  } else if (type === "copy") {
+    copyToClickboard(event.target.textContent);
   }
 });
+
 //функция отдает код рандомно созданного цвета
 // 0123456789ABCDEF все цвета, которые генерируют цвет
 //Math.floor округляем чтобы получить целое число
@@ -41,6 +44,10 @@ function generateRandomColor() {
   }
   return "#" + color;
 }
+
+function copyToClickboard(text) {
+  return navigator.clipboard.writeText(text);
+}
 //создаем рандомные цвета для колонок
 //итерируем с помощью forEach стрелочной функцией
 //text- меняем цвет,который соответствует колонке
@@ -50,24 +57,37 @@ function generateRandomColor() {
 //если нет,то пушим колор
 //и после выполнения цикла передаем масив колорз
 //
-function setRandomColors() {
-  const colors = [];
-  cols.forEach((col) => {
-    const isLoscet = col.querySelector("i").classList.contains("fa-lock");
+function setRandomColors(isInitial) {
+  const colors = isInitial ? getColorsFromHash() : [];
+
+  cols.forEach((col, index) => {
+    const isLocked = col.querySelector("i").classList.contains("fa-lock");
     const text = col.querySelector("h2");
     const button = col.querySelector("button");
-    const color = chroma.random();
-    if (isLoscet) {
+
+    if (isLocked) {
       colors.push(text.textContent);
       return;
     }
-    colors.push(color);
+
+    const color = isInitial
+      ? colors[index]
+        ? colors[index]
+        : chroma.random()
+      : chroma.random();
+
+    if (!isInitial) {
+      colors.push(color);
+    }
+
     text.textContent = color;
-    col.style.background = generateRandomColor();
+    col.style.background = color;
+
     setTextColor(text, color);
     setTextColor(button, color);
   });
-  updateColorHash(colors);
+
+  updateColorsHash(colors);
 }
 
 // функция оттенка цвета
@@ -79,7 +99,11 @@ function setTextColor(text, color) {
 }
 
 //удаляем # из хеша масива цветов
-function updateColorHash(colors = []) {
+function setTextColor(text, color) {
+  const luminance = chroma(color).luminance();
+  text.style.color = luminance > 0.5 ? "black" : "white";
+}
+function updateColorsHash(colors = []) {
   document.location.hash = colors
     .map((col) => {
       return col.toString().substring(1);
@@ -87,4 +111,14 @@ function updateColorHash(colors = []) {
     .join("-");
 }
 
-setRandomColors();
+function getColorsFromHash() {
+  if (document.location.hash.length > 1) {
+    return document.location.hash
+      .substring(1)
+      .split("-")
+      .map((color) => "#" + color);
+  }
+  return [];
+}
+
+setRandomColors(true);
